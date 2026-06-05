@@ -1,4 +1,4 @@
-import { View,Text,TextInput,TouchableOpacity,Image,StyleSheet,} from "react-native";
+import { View,Text,TextInput,TouchableOpacity,Image,StyleSheet,ScrollView,KeyboardAvoidingView,Platform} from "react-native";
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
@@ -34,36 +34,55 @@ export default function RecipesFormScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Image URL"
-        value={image}
-        onChangeText={setImage}
-        style={styles.input}
-      />
-      {image ? (
-        <Image source={{ uri: image }} style={styles.image} />
-      ) : (
-        <Text style={styles.imagePlaceholder}>Upload Image URL</Text>
-      )}
-      <TextInput
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-        multiline={true}
-        numberOfLines={4}
-        style={[styles.input, { height: hp(20), textAlignVertical: "top" }]}
-      />
-      <TouchableOpacity onPress={saverecipe} style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save recipe</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: hp(5) }}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{recipeToEdit ? "Edit Recipe" : "Add New Recipe"}</Text>
+          <View style={{ width: 40 }} /> 
+        </View>
+
+        <Text style={styles.label}>Recipe Title</Text>
+        <TextInput
+          placeholder="Enter recipe name..."
+          value={title}
+          onChangeText={setTitle}
+          style={styles.input}
+        />
+
+        <Text style={styles.label}>Image URL</Text>
+        <TextInput
+          placeholder="Paste image link here..."
+          value={image}
+          onChangeText={setImage}
+          style={styles.input}
+        />
+        
+        {image ? (
+          <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+          <View style={styles.imagePlaceholder}><Text>No Image Preview</Text></View>
+        )}
+
+        <Text style={styles.label}>Cooking Instructions / Description</Text>
+        <TextInput
+          placeholder="Describe how to cook this..."
+          value={description}
+          onChangeText={setDescription}
+          multiline={true}
+          style={[styles.input, { height: hp(20), textAlignVertical: "top" }]}
+        />
+
+        <TouchableOpacity onPress={saverecipe} style={styles.saveButton}>
+          <Text style={styles.saveButtonText}>Save recipe</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -71,18 +90,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: wp(4),
+    backgroundColor: '#fff'
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: hp(5),
+    marginBottom: hp(2)
+  },
+  headerTitle: {
+    fontSize: hp(2.5),
+    fontWeight: 'bold',
+    color: '#4B5563'
+  },
+  backText: {
+    color: '#4F75FF',
+    fontSize: hp(2)
+  },
+  label: {
+    fontSize: hp(1.8),
+    fontWeight: '600',
+    color: '#4B5563',
+    marginTop: hp(2)
   },
   input: {
-    marginTop: hp(4),
     borderWidth: 1,
     borderColor: "#ddd",
-    padding: wp(.5),
+    padding: wp(3),
     marginVertical: hp(1),
+    borderRadius: 8,
   },
   image: {
-    width: 300,
-    height:200,
-    margin: wp(2),
+    width: "100%",
+    height: hp(25),
+    borderRadius: 10,
+    marginVertical: hp(1),
   },
   imagePlaceholder: {
     height: hp(20),
@@ -96,7 +139,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#4F75FF",
-    padding: wp(.5),
+    padding: hp(1.5),
     alignItems: "center",
     borderRadius: 5,
     marginTop: hp(2),

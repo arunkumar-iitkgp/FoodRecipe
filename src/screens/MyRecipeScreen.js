@@ -14,6 +14,11 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
+  import { useRoute } from "@react-navigation/native";
+  import { useDispatch, useSelector } from "react-redux";
+  import { toggleFavorite } from "../redux/favoritesSlice";
+  import Categories from "../components/categories";
+  import FoodItems from "../components/recipes";
   
   export default function MyRecipeScreen() {
     const navigation = useNavigation();
@@ -35,14 +40,19 @@ import {
       };
   
       fetchrecipes();
-    }, [recipes]);
+    }, []);
   
     const handleAddrecipe = () => {
-      navigation.navigate("RecipesForm");
+      navigation.navigate("RecipesFormScreen", {
+        onrecipeEdited: async () => {
+          const storedRecipes = await AsyncStorage.getItem("customRecipes");
+          if (storedRecipes) setrecipes(JSON.parse(storedRecipes));
+        },
+      });
     };
   
     const handlerecipeClick = (recipe) => {
-      navigation.navigate("CustomRecipes", { recipe });
+      navigation.navigate("CustomRecipesScreen", { recipe });
     };
 
     const deleterecipe = async (index) => {
@@ -56,7 +66,7 @@ import {
     };
   
     const editrecipe = (recipe, index) => {
-      navigation.navigate("RecipesForm", {
+      navigation.navigate("RecipesFormScreen", {
         recipeToEdit: recipe,
         recipeIndex: index,
         onrecipeEdited: async () => {
@@ -68,6 +78,8 @@ import {
   
     return (
       <View style={styles.container}>
+        <Text style={styles.heading}>My Recipes</Text>
+
         {/* Back Button */}
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backButtonText}>{"Back"}</Text>
@@ -117,11 +129,18 @@ import {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      padding: wp(4),
       backgroundColor: "#F9FAFB",
     },
+    heading: {
+      fontSize: hp(3.8),
+      marginTop: hp(4),
+      marginLeft: wp(5),
+      fontWeight: "600",
+      color: "#4B5563",
+    },
     backButton: {
-      marginBottom: hp(1.5),
+      marginLeft: wp(5),
+      marginVertical: hp(1),
     },
     backButtonText: {
       fontSize: hp(2.2),
@@ -129,12 +148,12 @@ import {
     },
     addButton: {
       backgroundColor: "#4F75FF",
-      padding: wp(.7),
+      padding: hp(1.5),
       alignItems: "center",
       borderRadius: 5,
-      width:300,
-     marginLeft:500
-      // marginBottom: hp(2),
+      width: wp(50),
+      alignSelf: "center",
+      marginBottom: hp(2),
     },
     addButtonText: {
       color: "#fff",
@@ -143,12 +162,7 @@ import {
     },
     scrollContainer: {
       paddingBottom: hp(2),
-      height:'auto',
-      display:'flex',
-      alignItems:'center',
-      justifyContent:'center',
-      flexDirection:'row',
-      flexWrap:'wrap'
+      paddingHorizontal: wp(4),
     },
     norecipesText: {
       textAlign: "center",
@@ -157,10 +171,9 @@ import {
       marginTop: hp(5),
     },
     recipeCard: {
-      width: 400, // Make recipe card width more compact
-      height: 300, // Adjust the height of the card to fit content
+      width: wp(92), 
       backgroundColor: "#fff",
-      padding: wp(3),
+      padding: wp(4),
       borderRadius: 8,
       marginBottom: hp(2),
       shadowColor: "#000",
@@ -170,8 +183,8 @@ import {
       elevation: 3, // for Android shadow
     },
     recipeImage: {
-      width: 300, // Set width for recipe image
-      height: 150, // Adjust height of the image
+      width: "100%",
+      height: hp(20),
       borderRadius: 8,
       marginBottom: hp(1),
     },
@@ -190,12 +203,15 @@ import {
       flexDirection: "row",
       justifyContent: "space-between",
       marginTop: hp(1),
+      paddingTop: hp(1),
+      borderTopWidth: 1,
+      borderTopColor: "#F3F4F6",
     },
     editButton: {
       backgroundColor: "#34D399",
-      padding: wp(.5),
+      padding: hp(1),
       borderRadius: 5,
-      width: 100, // Adjust width of buttons to be more compact
+      width: wp(40),
       alignItems: "center",
     },
     editButtonText: {
@@ -205,9 +221,9 @@ import {
     },
     deleteButton: {
       backgroundColor: "#EF4444",
-      padding: wp(.5),
+      padding: hp(1),
       borderRadius: 5,
-      width: 100, // Adjust width of buttons to be more compact
+      width: wp(40),
       alignItems: "center",
     },
     deleteButtonText: {
