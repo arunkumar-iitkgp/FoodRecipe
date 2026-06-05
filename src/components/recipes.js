@@ -13,7 +13,15 @@ export default function Recipe({ categories, foods }) {
   return (
     <View style={styles.container}>
       <View testID="recipesDisplay">
-            
+        <FlatList
+          data={foods}
+          keyExtractor={(item) => item.idFood}
+          renderItem={renderItem}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={{ paddingBottom: hp(3) }}
+        />
       </View>
     </View>
   );
@@ -24,6 +32,22 @@ const ArticleCard = ({ item, index, navigation }) => {
     <View
       style={[styles.cardContainer, { paddingLeft: 20, paddingRight: 15}]} testID="articleDisplay"
     >
+      <TouchableOpacity 
+      onPress={() => navigation.navigate('RecipeDetail', { ...item })}
+      >
+    {/* Render your Image, Name Text, and Description Text here with specific styles */}
+        <Image
+          source={{ uri: item.recipeImage }}
+          style={styles.articleImage}
+          resizeMode="cover"
+        />
+        <Text style={styles.articleText} numberOfLines={2}>
+          {item.recipeName}
+        </Text>
+        <Text style={styles.articleDescription} numberOfLines={2}>
+          {item.cookingDescription || item.recipeInstructions.substring(0, 80) + "..."}
+        </Text>
+      </TouchableOpacity>
    
     </View>
   );
@@ -31,13 +55,13 @@ const ArticleCard = ({ item, index, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: wp(4), // mx-4 equivalent
+    marginHorizontal: wp(4), 
     marginTop: hp(2),
   },
   title: {
     fontSize: hp(3),
-    fontWeight: "600", // font-semibold
-    color: "#52525B", // text-neutral-600
+    fontWeight: "600", 
+    color: "#52525B", 
     marginBottom: hp(1.5),
   },
   loading: {
@@ -50,7 +74,7 @@ const styles = StyleSheet.create({
   },
   articleImage: {
     width: "100%",
-   
+    height: hp(20), 
     borderRadius: 35,
     backgroundColor: "rgba(0, 0, 0, 0.05)", // bg-black/5
   },
